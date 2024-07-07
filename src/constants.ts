@@ -1,0 +1,1 @@
+export const PHANTOM_LOCAL_STORAGE = 'phantom';
