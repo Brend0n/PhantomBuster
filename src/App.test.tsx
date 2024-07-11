@@ -1,36 +1,34 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { PHANTOM_LOCAL_STORAGE } from './constants';
-import { Dashboard } from './Dashboard';
+import { Dashboard } from './pages/Dashboard';
 
-const localStorageMock = (function () {
-  let store: { [key: string]: any } = {}
-  return {
-    getItem: function (key: string) {
-      return store[key] || null
-    },
-    setItem: function (key: string, value: string) {
-      store[key] = JSON.stringify(value)
-    },
-    clear: function () {
-      store = {}
-    }
-  }
-})()
 
-let localStorage: { [key: string]: string };
-let getItemMock;
-let setItemMock;
+let localStorage: { [PHANTOM_LOCAL_STORAGE]: { [key: string]: string } };
+let mockGetItem: jest.Mock<any>;
+let mockSetItem: jest.Mock<any>;
+let mockRemoveItem: jest.Mock<any>;
+
+const renderDashboard = () => { render(<MemoryRouter><Dashboard /></MemoryRouter>); }
+
 describe('dashboard', () => {
-
   beforeEach(() => {
-    localStorage = {};
-    getItemMock = jest.spyOn(window.localStorage, 'getItem').mockImplementation((key) =>
-      key in localStorage ? localStorage[key] : null
-    );
-    setItemMock = jest.spyOn(window.localStorage, 'setItem').mockImplementation(
-      (key, value) => (localStorage[key] = value + '')
-    );
-  });
+    localStorage = { [PHANTOM_LOCAL_STORAGE]: {} };
+    mockGetItem = jest.fn().mockImplementation((key: string,) => localStorage[PHANTOM_LOCAL_STORAGE][key]);
+    mockSetItem = jest.fn().mockImplementation((key: string, value: any) => {
+      localStorage[PHANTOM_LOCAL_STORAGE] = {
+        [key]: value,
+        ...localStorage[PHANTOM_LOCAL_STORAGE]
+      }
+    });
+    Object.defineProperty(window, "localStorage", {
+      value: {
+        getItem: (...args: string[]) => mockGetItem(...args),
+        setItem: (...args: string[]) => mockSetItem(...args),
+        removeItem: (...args: string[]) => mockRemoveItem(...args),
+      },
+    });
+  })
 
   it('should renders the dashboard with correct data', () => {
     const testPhantom = {
@@ -40,7 +38,7 @@ describe('dashboard', () => {
       manifest: { tags: { categories: ['cat1', 'cat2'] } }
     }
     window.localStorage.setItem(PHANTOM_LOCAL_STORAGE, JSON.stringify({ [testPhantom.id]: testPhantom }));
-    render(<Dashboard />);
+    renderDashboard();
     screen.getByText(testPhantom.name);
     expect(screen.getByText(testPhantom.name)).toBeDefined();
   });

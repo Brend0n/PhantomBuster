@@ -1,9 +1,7 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
-import { Dashboard } from './Dashboard';
-import { Phantoms } from './Phantoms';
+import { Dashboard } from './pages/Dashboard';
+import { PhantomLibrary } from './pages/PhantomLibrary';
 
 function App() {
   return (
@@ -11,7 +9,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/phantoms?' Component={Dashboard} />
-          <Route path='/phantombuster' Component={Phantoms} />
+          <Route path='/phantombuster' Component={PhantomLibrary} />
         </Routes>
       </BrowserRouter>
     </div>

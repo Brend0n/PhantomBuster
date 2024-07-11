@@ -38,8 +38,3 @@ export type IPhantom = {
     }
 }
 
-export enum PhantomAction {
-    RENAME = 'rename',
-    DUPLICATE = 'duplicate',
-    DELETE = 'delete',
-}
